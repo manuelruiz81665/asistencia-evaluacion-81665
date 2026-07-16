@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#167D8D">
+  <meta name="description" content="Sistema de asistencia y evaluación de la I.E. 81665 AKE">
+  <title>EduTrack | I.E. 81665 AKE</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <div id="offlineBanner" class="offline-banner" hidden>
+    Sin conexión: los registros se guardarán en el celular.
+  </div>
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">I.E. 81665 AKE</p>
+      <h1>EduTrack</h1>
+      <p class="subtitle">Asistencia y evaluación</p>
+    </div>
+    <button id="themeBtn" class="icon-btn" aria-label="Cambiar tema">◐</button>
+  </header>
+
+  <main class="container">
+    <section class="teacher-card">
+      <div class="avatar">MR</div>
+      <div>
+        <span>Docente</span>
+        <strong>Manuel L. Ruiz Valderrama</strong>
+      </div>
+      <span id="syncStatus" class="sync-pill">Sin configurar</span>
+    </section>
+
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <span class="hero-icon">✓</span>
+        <div>
+          <h2>Gestión rápida del aula</h2>
+          <p>Registra asistencia y evaluación desde tu celular.</p>
+        </div>
+      </div>
+
+      <div class="menu-grid">
+        <button class="menu-card teal" data-view="attendanceView">
+          <span class="menu-icon">▣</span>
+          <strong>Asistencia</strong>
+          <small>Escanear códigos QR</small>
+        </button>
+
+        <button class="menu-card purple" data-view="evaluationView">
+          <span class="menu-icon">★</span>
+          <strong>Evaluación</strong>
+          <small>Registrar niveles de logro</small>
+        </button>
+
+        <button class="menu-card blue" data-view="studentsView">
+          <span class="menu-icon">♙</span>
+          <strong>Estudiantes</strong>
+          <small>Consultar nómina</small>
+        </button>
+
+        <button class="menu-card orange" data-view="reportsView">
+          <span class="menu-icon">▥</span>
+          <strong>Resumen</strong>
+          <small>Registros del dispositivo</small>
+        </button>
+
+        <button class="menu-card gray full-card" data-view="settingsView">
+          <span class="menu-icon">⚙</span>
+          <strong>Configuración</strong>
+          <small>Conectar con Google Sheets</small>
+        </button>
+      </div>
+    </section>
+
+    <section id="attendanceView" class="view">
+      <div class="section-heading">
+        <button class="back-btn" data-view="homeView">←</button>
+        <div><h2>Registro de asistencia</h2><p>Selecciona la sesión y escanea.</p></div>
+      </div>
+
+      <form id="sessionForm" class="panel form-grid">
+        <label>Área<select id="area" required></select></label>
+        <label>Grado<select id="grade" required></select></label>
+        <label>Sección<select id="section" required></select></label>
+        <label>Fecha<input id="date" type="date" required></label>
+        <label>Hora de inicio<input id="startTime" type="time" required></label>
+        <label>Tolerancia<input id="tolerance" type="number" min="0" max="60" value="10"></label>
+      </form>
+
+      <div class="panel">
+        <div id="reader"></div>
+        <div class="button-row">
+          <button id="startScannerBtn" class="btn primary">Iniciar escáner</button>
+          <button id="stopScannerBtn" class="btn secondary">Detener</button>
+        </div>
+        <div id="scanResult" class="result-card neutral">
+          <strong>Esperando inicio…</strong>
+          <span>Los registros aparecerán aquí.</span>
+        </div>
+        <div class="counter"><strong id="attendanceCounter">0</strong><span>registrados</span></div>
+      </div>
+
+      <button id="closeSessionBtn" class="btn danger full-width">Cerrar sesión y marcar faltas</button>
+    </section>
+
+    <section id="evaluationView" class="view">
+      <div class="section-heading">
+        <button class="back-btn" data-view="homeView">←</button>
+        <div><h2>Evaluación rápida</h2><p>Versión inicial preparada para registrar criterios.</p></div>
+      </div>
+
+      <div class="panel">
+        <label>Código del estudiante
+          <input id="evaluationCode" placeholder="Ejemplo: EST-001">
+        </label>
+        <label>Área
+          <select id="evaluationArea"></select>
+        </label>
+        <label>Competencia o criterio
+          <input id="criterion" placeholder="Escribe el criterio evaluado">
+        </label>
+        <fieldset class="achievement-grid">
+          <legend>Nivel de logro</legend>
+          <label><input type="radio" name="level" value="C"> C · Inicio</label>
+          <label><input type="radio" name="level" value="B"> B · Proceso</label>
+          <label><input type="radio" name="level" value="A" checked> A · Logrado</label>
+          <label><input type="radio" name="level" value="AD"> AD · Destacado</label>
+        </fieldset>
+        <label>Observación
+          <textarea id="evaluationNote" rows="3" placeholder="Comentario breve opcional"></textarea>
+        </label>
+        <button id="saveEvaluationBtn" class="btn primary full-width">Guardar evaluación</button>
+        <div id="evaluationResult" class="result-card neutral">
+          <strong>Sin registros recientes</strong>
+        </div>
+      </div>
+    </section>
+
+    <section id="studentsView" class="view">
+      <div class="section-heading">
+        <button class="back-btn" data-view="homeView">←</button>
+        <div><h2>Estudiantes</h2><p>Nómina obtenida desde Google Sheets.</p></div>
+      </div>
+      <div class="panel">
+        <div class="button-row">
+          <button id="loadStudentsBtn" class="btn primary">Actualizar nómina</button>
+        </div>
+        <input id="studentSearch" type="search" placeholder="Buscar por nombre o código">
+        <div id="studentList" class="student-list">
+          <p class="empty">Todavía no se ha cargado la nómina.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="reportsView" class="view">
+      <div class="section-heading">
+        <button class="back-btn" data-view="homeView">←</button>
+        <div><h2>Resumen local</h2><p>Incluye registros pendientes de sincronización.</p></div>
+      </div>
+      <div id="summaryCards" class="summary-grid"></div>
+      <div class="panel">
+        <div class="button-row">
+          <button id="syncBtn" class="btn primary">Sincronizar ahora</button>
+          <button id="clearLocalBtn" class="btn secondary">Limpiar historial local</button>
+        </div>
+        <div id="localLog" class="local-log"></div>
+      </div>
+    </section>
+
+    <section id="settingsView" class="view">
+      <div class="section-heading">
+        <button class="back-btn" data-view="homeView">←</button>
+        <div><h2>Configuración</h2><p>Conecta la aplicación con Apps Script.</p></div>
+      </div>
+      <div class="panel">
+        <label>URL del servicio Apps Script
+          <input id="apiUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+        </label>
+        <label>Clave privada de la aplicación
+          <input id="apiKey" type="password" placeholder="La misma clave configurada en Código.gs">
+        </label>
+        <button id="saveSettingsBtn" class="btn primary full-width">Guardar configuración</button>
+        <button id="testConnectionBtn" class="btn secondary full-width">Probar conexión</button>
+        <div id="connectionResult" class="result-card neutral">
+          <strong>No se ha probado la conexión.</strong>
+        </div>
+      </div>
+
+      <div class="panel install-panel">
+        <h3>Instalar en el celular</h3>
+        <p>Cuando la aplicación esté publicada, Chrome permitirá agregarla a la pantalla de inicio.</p>
+        <button id="installBtn" class="btn primary full-width" hidden>Instalar EduTrack</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-view="homeView" class="active">Inicio</button>
+    <button data-view="attendanceView">Asistencia</button>
+    <button data-view="evaluationView">Evaluación</button>
+    <button data-view="reportsView">Resumen</button>
+  </nav>
+
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>
