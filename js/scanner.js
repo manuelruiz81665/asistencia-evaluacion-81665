@@ -10,7 +10,7 @@ class ScannerController{
       const rear=cameras.find(c=>/back|rear|environment|trasera/i.test(c.label))||cameras[cameras.length-1];
       await this.scanner.start(rear.id,{fps:10,qrbox:{width:250,height:250},aspectRatio:1},async text=>{
         if(this.locked)return;this.locked=true;
-        try{await onScan(text);}finally{setTimeout(()=>this.locked=false,1400);}
+        try{await onScan(text);}finally{setTimeout(() => this.locked = false, 4000);}
       },()=>{});
     }catch(e){this.scanner=null;throw new Error(this.friendlyError(e));}
   }
